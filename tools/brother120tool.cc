@@ -341,9 +341,18 @@ void listDirectory()
     }
 }
 
-void insertFile(const std::string& filename)
+void insertFile(std::string filename)
 {
-    auto leafname = getLeafname(filename);
+	std::string leafname;
+	int equals = filename.find('=');
+	if (equals == std::string::npos)
+		leafname = getLeafname(filename);
+	else
+	{
+		leafname = filename.substr(0, equals);
+		filename = filename.substr(equals+1);
+	}
+
     if (leafname.size() > 8)
         Error() << "filename too long";
     std::cout << fmt::format("Inserting '{}'\n", leafname);
@@ -366,7 +375,7 @@ void insertFile(const std::string& filename)
 	uint16_t checksum = 0;
     while (!inputFile.eof())
     {
-        uint8_t buffer[SECTOR_SIZE];
+        uint8_t buffer[SECTOR_SIZE] = {};
         inputFile.read((char*) buffer, sizeof(buffer));
 		for (int i=0; i<inputFile.gcount(); i++)
 			checksum += buffer[i];
